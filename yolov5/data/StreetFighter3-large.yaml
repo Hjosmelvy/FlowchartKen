@@ -1,0 +1,28 @@
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: ../Street Fighter Character Sprites YOLO LARGER # dataset root dir
+train: train/images  # train images (relative to 'path') 128 images
+val: val/images # val images (relative to 'path') 128 images
+test: test/images # test images (optional)
+
+# Classes (20 COCO classes)
+names:
+  0: Dudley
+  1: Alex
+  2: Chun-Li
+  3: Elena
+  4: Hugo
+  5: Ken
+  6: Makato
+  7: Necro 
+  8: Oro  
+  9: Ryu
+  10: Sean
+  11: Yang
+  12: Yun
+  13: Gill
+  14: Akuma
+  15: Ibuki
+  16: Q
+  17: Remy
+  18: Twelve 
+  19: Urien
