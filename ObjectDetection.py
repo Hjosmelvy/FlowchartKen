@@ -5,6 +5,7 @@ import threading
 import cv2
 import torch
 from Character import Character
+from Character import Algorithm
 from yolov5.utils import *
 from torchvision.io import read_image
 import numpy as np
@@ -12,7 +13,6 @@ from PIL import Image
 from mss import mss
 import win32gui
 import config
-import gui 
 import wx
 
 # Screen capture
@@ -33,6 +33,31 @@ class GetImage(threading.Thread):
         while not self.stopped:
             self.frame = cv2.cvtColor(np.array(self.sct.grab(self.bounding_box)), cv2.COLOR_RGB2BGR)
             
+            # if not config.player2.empty():
+            #     self.frame = cv2.circle( self.frame, config.player2.midpoint, radius=0, color=(0,255,255), thickness=2)
+    def stop(self):
+        self.stopped = True
+
+class SideSelectInput(threading.Thread):
+    def __init__(self, bounding_box):
+        self.bounding_box = bounding_box
+        self.sct = mss()
+        self.stopped = False
+        self.frame =  cv2.cvtColor(np.array(self.sct.grab(self.bounding_box)), cv2.COLOR_RGB2BGR)
+    def start(self):
+        Thread(target=self.get, args=()).start()
+        return self
+    def get(self):
+        while not self.stopped:
+            key = cv2.waitKey(0)
+            if(key == ord(2)):
+                #if left arrow key is press 
+                 
+                pass
+            elif(key == ord(3)):
+                #if right arrow key is press
+                pass   
+                
             # if not config.player2.empty():
             #     self.frame = cv2.circle( self.frame, config.player2.midpoint, radius=0, color=(0,255,255), thickness=2)
     def stop(self):
@@ -102,9 +127,9 @@ class ObjectDetection:
         """
         imageGetter = GetImage(self.bounding_box)
         imageGetter.start()
-        app = wx.App()
-        frame = gui.MainGui()
-        app.MainLoop()
+
+        test = Algorithm(config.player2)
+        test.start()
         while True:
             sct_img = imageGetter.frame
             results = self.model(sct_img)
@@ -114,7 +139,7 @@ class ObjectDetection:
             if not config.player1.empty():
                 # print({config.player1.ymax,config.player1.isKnockedDown()})
                 print(config.player1.isKnockedDown())
-                self.updatePosition()
+                Character.updatePlayers(config.player1,config.player2)
             cv2.imshow('screen', np.squeeze(results.render()))
 
             if (cv2.waitKey(1) == ord('q')  or imageGetter.stopped):

@@ -1,4 +1,8 @@
+import logging
 from math import sqrt
+import threading
+import time
+import traceback
 from typing import Type
 from xmlrpc.client import Boolean
 import KeyboardOutput.CommandList as CommandList
@@ -9,7 +13,7 @@ from numpy import absolute
 
 class Character():
     @staticmethod
-    def distance(p1, p2):  # simple function, I hope you are more comfortable
+    def distance(p1, p2):  
         return sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
     def __init__(self, dataframe=pandas.DataFrame()):
@@ -80,6 +84,22 @@ class Character():
             config.player1 = char2
             config.player2 = char1
 
+class Algorithm(threading.Thread):
+    def __init__(self, character: Character):
+        self.stopped = False
+    def start(self):
+        threading.Thread(target=self.play, args=()).start()
+        return self
+    def stop(self):
+        self.stopped = True
+    def play(self):
+        while not self.stopped:
+            try:
+                CommandList.upLeft()
+                time.sleep(.5)
+            except Exception as e:
+                logging.error(traceback.format_exc())
+      
 
 # class GetImage(threading.Thread):
 #     def __init__(self, bounding_box):

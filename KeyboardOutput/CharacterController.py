@@ -2,7 +2,7 @@ import ctypes
 import time
 import cv2
 
-from KeyboardOutput import CommandList
+import KeyboardOutput.CommandList as CommandList
 SendInput = ctypes.windll.user32.SendInput
 
 ## LIST OF ALL KEYS: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
@@ -73,9 +73,10 @@ def releaseKey(hexKeyCode):
     x = Input(ctypes.c_ulong(1), ii_)
     ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
-def tapKey(self,hexKeyCode):
-    self.pressKey(hexKeyCode)
-    self.releaseKey(hexKeyCode)
+def tapKey(hexKeyCode):
+    pressKey(hexKeyCode)
+    time.sleep(0.01)
+    releaseKey(hexKeyCode)
 
 
 
@@ -83,16 +84,16 @@ def tapKey(self,hexKeyCode):
 # http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
 
 if __name__ == '__main__':
-    # while (True):
-    #     CharacterController.PressKey(0x11)
-    #     CharacterController.PressKey(0x1E)
 
-    #     time.sleep(1)
-    #     CharacterController.ReleaseKey(0x11)
-    #     CharacterController.ReleaseKey(0x1E)
-    #     time.sleep(1)
 
-    #     if (cv2.waitKey(1) & 0xFF) == ord('q'):
-    #         break
-     
-    CommandList.left(10)
+    time.sleep(1)
+        # releaseKey(0x11)
+        # releaseKey(0x1E)
+        # time.sleep(1)
+
+   
+ 
+    CommandList.fbForward()
+
+
+
