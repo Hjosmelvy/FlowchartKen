@@ -1,3 +1,4 @@
+from asyncio import Condition 
 import logging
 from math import sqrt
 import threading
@@ -10,8 +11,11 @@ import pandas
 from numpy import subtract
 from numpy import absolute
 
-
 class Character():
+    previous_health = 0
+    current_health = 0
+    health_location = None 
+   
     @staticmethod
     def distance(p1, p2):  
         return sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
@@ -30,12 +34,15 @@ class Character():
             self.isRightSide = 0  # which side the character is facing
             self.midpoint = (0, 0)
             self.dataframe = dataframe
+            
 
     def calculate_midpoint(self):
         x = (self.xmin + self.xmax) / 2
         y = (self.ymin + self.ymax) / 2
         return (x, y)
 
+
+    
     def isKnockedDown(self):
         if self.ymax < 740:
             return True
@@ -54,6 +61,11 @@ class Character():
                 return True
         return False
 
+ 
+
+    def empty(self):
+        return self.dataframe.empty
+
     @staticmethod
     def generatePlayers(dataframe: pandas.core.frame.DataFrame):
         p1 = Character()
@@ -65,9 +77,6 @@ class Character():
             p1 = Character(dataframe.iloc[0])
 
         return p1, p2
-
-    def empty(self):
-        return self.dataframe.empty
 
     @staticmethod
     def updatePlayers(char1, char2):
@@ -96,19 +105,11 @@ class Algorithm(threading.Thread):
         while not self.stopped:
             try:
                 CommandList.upLeft()
+                time.sleep(.49)
+                CommandList.fbBackward
                 time.sleep(.5)
             except Exception as e:
                 logging.error(traceback.format_exc())
-      
+    
+        
 
-# class GetImage(threading.Thread):
-#     def __init__(self, bounding_box):
-#         self.bounding_box = bounding_box
-#         self.stopped = False
-#     def start(self):
-#         threading.Thread(target=self.get, args=()).start()
-#         return self
-#     def get(self):
-#         while not self.stopped:
-#     def stop(self):
-#         self.stopped = True

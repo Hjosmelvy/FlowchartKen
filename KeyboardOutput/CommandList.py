@@ -1,3 +1,4 @@
+import asyncio
 import KeyboardOutput.CharacterController as CharacterController
 import KeyboardOutput.ScanCode as ScanCode
 import time
@@ -42,19 +43,22 @@ def down():
 def upLeft():
     CharacterController.pressKey(ScanCode.ScanCode.KEY_W.value)
     CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
+    time.sleep(.05)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_W.value)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
 def upRight():
     CharacterController.pressKey(ScanCode.ScanCode.KEY_W.value)
     CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
+    time.sleep(.05)
+
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_W.value)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
-def downForward():
+def downRight():
     CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
     CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
-    time.sleep(.01)
+    time.sleep(.05)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
@@ -65,10 +69,10 @@ def downForward():
 #     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
 #     CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
-def downBack():
+def downLeft():
     CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
     CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
-    time.sleep(.01)
+    time.sleep(.05)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
     CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
@@ -79,41 +83,57 @@ def downBack():
 #     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
 #     CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
-def dpForward():
+def dpRight():
     #dragon punch motion forward
     right()
     down()
-    downForward()
-    time.sleep(.01)
+    downRight()
+    time.sleep(.05)
     heavyPunch()
 
 
-def dpBackward():
+def dpLeft():
     left()
     down()
-    downBack()
-    time.sleep(.01)
+    downLeft()
+    time.sleep(.05)
     heavyPunch()
-def qcForward():
+def qcRight():
     #quarter circle motion forward
     down()
-    downForward()
+    downRight()
     right()
 
-def qcBackward():
+def qcLeft():
     #quarter circle motion backward
     down()
-    downBack()
+    downLeft()
     left()
-    # time.sleep(.01)
 
-def fbForward():
-    qcForward()
-    time.sleep(.01)
 
+def fbRight():
+    qcRight()
+    time.sleep(.05)
     heavyPunch()
 
-def fbBackward():
-    qcBackward()
-    time.sleep(.01)
+def fbLeft():
+    qcLeft()
+    time.sleep(.05)
     heavyPunch()
+
+async def test():
+    while True:
+        dpLeft()
+        await asyncio.sleep(1)
+
+        upRight()
+        await asyncio.sleep(0.81)
+
+        upLeft()
+        await asyncio.sleep(0.81)
+
+
+if __name__ == '__main__':
+
+    asyncio.run(test())
+

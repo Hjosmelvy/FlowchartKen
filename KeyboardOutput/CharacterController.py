@@ -2,7 +2,8 @@ import ctypes
 import time
 import cv2
 
-import KeyboardOutput.CommandList as CommandList
+import KeyboardOutput.CommandList
+import asyncio
 SendInput = ctypes.windll.user32.SendInput
 
 ## LIST OF ALL KEYS: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
@@ -79,21 +80,21 @@ def tapKey(hexKeyCode):
     releaseKey(hexKeyCode)
 
 
+# # directx scan codes
+# # http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
 
-# directx scan codes
-# http://www.gamespp.com/directx/directInputKeyboardScanCodes.html
+# if __name__ == '__main__':
 
-if __name__ == '__main__':
+    # asyncio.run(test())
+    # while True:
+    #     time.sleep(.5)
+    #         # releaseKey(0x11)
+    #         # releaseKey(0x1E)
+    #         # time.sleep(1)
 
-
-    time.sleep(1)
-        # releaseKey(0x11)
-        # releaseKey(0x1E)
-        # time.sleep(1)
-
-   
- 
-    CommandList.fbForward()
+    
+    
+    #     CommandList.down()
 
 
 
