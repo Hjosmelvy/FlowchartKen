@@ -1,100 +1,139 @@
-from KeyboardOutput import CharacterController 
-from KeyboardOutput import ScanCode
+import asyncio
+import KeyboardOutput.CharacterController as CharacterController
+import KeyboardOutput.ScanCode as ScanCode
 import time
 
 #
 #   The methods below assume the character is facing right
 #
 
+
+def heavyPunch():
+    CharacterController.tapKey(ScanCode.ScanCode.KEY_NUMPAD9.value)
 def jump():
-    CharacterController.tapKey(ScanCode.KEY_W.value)
+    CharacterController.tapKey(ScanCode.ScanCode.KEY_W.value)
 
 def left():
-    CharacterController.tapKey(ScanCode.KEY_A.value)
+    CharacterController.tapKey(ScanCode.ScanCode.KEY_A.value)
 
-def left(seconds:int):
-    CharacterController.pressKey(ScanCode.KEY_A.value)
-    time.sleep(seconds)
-    CharacterController.releaseKey(ScanCode.KEY_A.value)
+# def left(seconds:int):
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
+#     time.sleep(seconds)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
 
 def right():
-    CharacterController.tapKey(ScanCode.KEY_D.value)
+    CharacterController.tapKey(ScanCode.ScanCode.KEY_D.value)
 
-def right(seconds:int):
-    CharacterController.pressKey(ScanCode.KEY_D.value)
-    time.sleep(seconds)
-    CharacterController.releaseKey(ScanCode.KEY_D.value)
+# def right(seconds:int):
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
+#     time.sleep(seconds)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
 
 def down():
-    CharacterController.tapKey(ScanCode.KEY_S.value)
+    CharacterController.tapKey(ScanCode.ScanCode.KEY_S.value)
 
-def down(seconds:int):
-    CharacterController.pressKey(ScanCode.KEY_S.value)
-    time.sleep(seconds)
-    CharacterController.releaseKey(ScanCode.KEY_S.value)
+# def down(seconds:int):
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
+#     time.sleep(seconds)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
 
 
 def upLeft():
-    CharacterController.pressKey(ScanCode.KEY_W.value)
-    CharacterController.pressKey(ScanCode.KEY_A.value)
-    CharacterController.releaseKey(ScanCode.KEY_W.value)
-    CharacterController.releaseKey(ScanCode.KEY_A.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_W.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
+    time.sleep(.05)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_W.value)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
 def upRight():
-    CharacterController.pressKey(ScanCode.KEY_W.value)
-    CharacterController.pressKey(ScanCode.KEY_D.value)
-    CharacterController.releaseKey(ScanCode.KEY_W.value)
-    CharacterController.releaseKey(ScanCode.KEY_D.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_W.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
+    time.sleep(.05)
 
-def downForward():
-    CharacterController.pressKey(ScanCode.KEY_S.value)
-    CharacterController.pressKey(ScanCode.KEY_D.value)
-    CharacterController.releaseKey(ScanCode.KEY_S.value)
-    CharacterController.releaseKey(ScanCode.KEY_D.value)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_W.value)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
-def downForward(seconds:int):
-    CharacterController.pressKey(ScanCode.KEY_S.value)
-    CharacterController.pressKey(ScanCode.KEY_D.value)
-    time.sleep(seconds)
-    CharacterController.releaseKey(ScanCode.KEY_S.value)
-    CharacterController.releaseKey(ScanCode.KEY_D.value)
+def downRight():
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
+    time.sleep(.05)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
-def downBack():
-    CharacterController.pressKey(ScanCode.KEY_S.value)
-    CharacterController.pressKey(ScanCode.KEY_A.value)
-    CharacterController.releaseKey(ScanCode.KEY_S.value)
-    CharacterController.releaseKey(ScanCode.KEY_A.value)
+# def downForward(seconds:int):
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_D.value)
+#     time.sleep(seconds)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_D.value)
 
-def downBack(seconds:int):
-    CharacterController.pressKey(ScanCode.KEY_S.value)
-    CharacterController.pressKey(ScanCode.KEY_A.value)
-    time.sleep(seconds)
-    CharacterController.releaseKey(ScanCode.KEY_S.value)
-    CharacterController.releaseKey(ScanCode.KEY_A.value)
+def downLeft():
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
+    CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
+    time.sleep(.05)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
+    CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
 
-def dpForward():
+# def downBack(seconds:int):
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_S.value)
+#     CharacterController.pressKey(ScanCode.ScanCode.KEY_A.value)
+#     time.sleep(seconds)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_S.value)
+#     CharacterController.releaseKey(ScanCode.ScanCode.KEY_A.value)
+
+def dpRight():
     #dragon punch motion forward
     right()
     down()
-    downForward()
+    downRight()
+    time.sleep(.05)
+    heavyPunch()
 
 
-def dpBackward():
-    #dragon punch motion backwards
+def dpLeft():
     left()
     down()
-    downBack()
-
-def qcForward():
+    downLeft()
+    time.sleep(.05)
+    heavyPunch()
+def qcRight():
     #quarter circle motion forward
     down()
-    downForward()
+    downRight()
     right()
 
-def qcForward():
+def qcLeft():
     #quarter circle motion backward
     down()
-    downBack()
+    downLeft()
     left()
+
+
+def fbRight():
+    qcRight()
+    time.sleep(.05)
+    heavyPunch()
+
+def fbLeft():
+    qcLeft()
+    time.sleep(.05)
+    heavyPunch()
+
+async def test():
+    while True:
+        dpLeft()
+        await asyncio.sleep(1)
+
+        upRight()
+        await asyncio.sleep(0.81)
+
+        upLeft()
+        await asyncio.sleep(0.81)
+
+
+if __name__ == '__main__':
+
+    asyncio.run(test())
+

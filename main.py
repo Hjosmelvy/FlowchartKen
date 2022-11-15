@@ -1,13 +1,15 @@
     
+from HealthTracker import HealthTracker
 from ObjectDetection import ObjectDetection
+from config import player2
+import asyncio
 
-
-def main():
+async def main():
     od = ObjectDetection()
-    od.capturePredict()
+    od.capture()
+  
 
-
- 
 if __name__ == "__main__":
-    main()
-    
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

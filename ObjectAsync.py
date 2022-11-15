@@ -39,6 +39,30 @@ class GetImage(threading.Thread):
     def stop(self):
         self.stopped = True
 
+class SideSelectInput(threading.Thread):
+    def __init__(self, bounding_box):
+        self.bounding_box = bounding_box
+        self.sct = mss()
+        self.stopped = False
+        self.frame =  np.array(self.sct.grab(self.bounding_box))
+    def start(self):
+        Thread(target=self.get, args=()).start()
+        return self
+    def get(self):
+        while not self.stopped:
+            key = cv2.waitKey(0)
+            if(key == ord(2)):
+                #if left arrow key is press 
+                 
+                pass
+            elif(key == ord(3)):
+                #if right arrow key is press
+                pass   
+                
+            # if not config.player2.empty():
+            #     self.frame = cv2.circle( self.frame, config.player2.midpoint, radius=0, color=(0,255,255), thickness=2)
+    def stop(self):
+        self.stopped = True
 
 
 
@@ -110,11 +134,13 @@ class ObjectDetection:
         results = self.model(sct_img)
         char1, char2 =  Character.generatePlayers(results.pandas().xyxy[0])
         Character.updatePlayers(char1,char2)
-        loop = asyncio.get_event_loop()
+        # ht = HealthTracker()
+
         while True:
             sct_img = imageGetter.frame
             results = self.model(sct_img)
-            asyncio.ensure_future(HealthTracker.updatePlayersHealth(sct_img))
+            HealthTracker.updatePlayersHealth(sct_img)
+
             if not config.player1.empty():
                 # print({config.player1.ymax,config.player1.isKnockedDown()})
 
@@ -122,6 +148,7 @@ class ObjectDetection:
 
             cv2.imshow('screen', np.squeeze(results.render()))
 
+            asyncio.run(HealthTracker.checkHit(3, config.player2))
 
             if (cv2.waitKey(1) == ord('q')  or imageGetter.stopped):
                 cv2.destroyAllWindows()
@@ -131,49 +158,4 @@ class ObjectDetection:
 
 
 
-            
 
-    
-
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-# model.to(device)
-
-# bounding_box = {'top': 0, 'left': 0, 'width': 1248, 'height': 896}
-
-# sct = mss()
-# while True:
-#     sct_img = np.array(sct.grab(bounding_box))
-
-#     result = model(sct_img)
-#     result.print()
-#     # if result == None:
-#     #     result = sct_img
-
-#     cv2.imshow('screen', np.squeeze(result.render()))
-#     if (cv2.waitKey(1) & 0xFF) == ord('q'):
-#         cv2.destroyAllWindows()
-#         break
-
-
-# Recording Screen
-# while True:
-#     sct_img = sct.grab(bounding_box)
-#     cv2.imshow('screen', np.array(sct_img))
-
-#     if (cv2.waitKey(1) & 0xFF) == ord('q'):
-#         cv2.destroyAllWindows()
-#         break
-
-# results.xyxy[0]  # im1 predictions (tensor)
-# results.pandas().xyxy[0]  # im1 predictions (pandas)
-# # #      xmin    ymin    xmax   ymax  confidence  class    name
-# # # 0  749.50   43.50  1148.0  704.5    0.874023      0  person
-# # # 1  433.50  433.50   517.5  714.5    0.687988     27     tie
-# # # 2  114.75  195.75  1095.0  708.0    0.624512      0  person
-# # # 3  986.00  304.00  1028.0  420.0    0.286865     27     tie
-
-
-#          xmin        ymin         xmax        ymax  confidence  class     name
-# 0  621.556458  465.093292   874.244751  872.699524    0.967523      9  Chun-Li
-# 1  998.945435  423.396118  1203.942261  877.145691    0.930768      9  Chun-Li
-# <class 'pandas.core.frame.DatadaaFrame'>
