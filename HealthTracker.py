@@ -20,15 +20,22 @@ import wx
 
 
 
-class HealthTracker():
-
-
-    def getHealthPercent( health):
+class HealthTracker(threading.Thread):
+    def __init__(self, ):
+        self.stopped = False
+        self.frame = None
+        # self.queue = queue
+    def setFrame(self, frame):
+        self.frame = frame 
+    def start(self, frame):
+        Thread(target=lambda: self.updatePlayersHealth(frame)).start()
+        return self 
+    def getHealthPercent(health):
         """
             returns player health as a percent given array with the location of players health bar
         """
 
-        totalHealth = 497     #x                 #o              #x
+        totalHealth = 497     
         filter = np.asarray([[0,195,255,255], [0,251,16,255], [0,251,255,255]])
         # print(filter)
         bool = (health[:,None] == filter).all(-1).any(-1)
@@ -36,44 +43,46 @@ class HealthTracker():
         np.reshape(health, (4, -1))
         return round(np.shape(health)[0] / totalHealth , 2)
 
-    def updatePlayersHealth(frame: np.array):
+    def updatePlayersHealth(self, frame: np.array):
     
         player1Health = frame[132,33:530]
         player2Health = frame[132,680:1177]
-        config.player1.previous_health = config.player1.current_health
-        config.player2.previous_health = config.player2.current_health
-        config.player1.current_health = HealthTracker.getHealthPercent(player1Health)
-        config.player2.current_health = HealthTracker.getHealthPercent(player2Health)
 
-
-    async def hit_event_handler(player : Character, flag : asyncio.Event()):    
+        while not self.stopped:
+            config.player1.previous_health = config.player1.current_health
+            config.player2.previous_health = config.player2.current_health
+            config.player1.current_health = HealthTracker.getHealthPercent(player1Health)
+            config.player2.current_health = HealthTracker.getHealthPercent(player2Health)
+            print(config.player2.current_health)
+    
+    # async def hit_event_handler(player : Character, flag : asyncio.Event()):    
         
-        while True:
-            if player.previous_health > player.current_health:
-                flag.set()
-                break
-    async def checkHit( time, player : Character):
-        flag = asyncio.Event()
+    #     while True:
+    #         if player.previous_health > player.current_health:
+    #             flag.set()
+    #             break
+    # async def checkHit( time, player : Character):
+    #     flag = asyncio.Event()
 
-        try:
-            await asyncio.wait_for(HealthTracker.hit_event_handler(player,flag), timeout=time)
-        except TimeoutError:
-            print("missed")
-            return False
-        print("hit")
-        return True      
+    #     try:
+    #         await asyncio.wait_for(HealthTracker.hit_event_handler(player,flag), timeout=time)
+    #     except TimeoutError:
+    #         print("missed")
+    #         return False
+    #     print("hit")
+    #     return True      
 
-    async def eternity():
-        # Sleep for one hour
-        await asyncio.sleep(3600)
-        print('yay!')
+    # async def eternity():
+    #     # Sleep for one hour
+    #     await asyncio.sleep(3600)
+    #     print('yay!')
 
-    async def test():
-        # Wait for at most 1 second
-        try:
-            await asyncio.wait_for(HealthTracker.eternity(), timeout=1.0)
-        except TimeoutError:
-            print('timeout!')
+    # async def test():
+    #     # Wait for at most 1 second
+    #     try:
+    #         await asyncio.wait_for(HealthTracker.eternity(), timeout=1.0)
+    #     except TimeoutError:
+    #         print('timeout!')
 
 
 # Expected output:
