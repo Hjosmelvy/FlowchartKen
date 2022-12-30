@@ -1,23 +1,14 @@
-from asyncio import get_event_loop
-import asyncio
-import sys
+
 from threading import Thread
 import threading
 import cv2
-import torch
 from Character import Character
-from Character import Algorithm
-from HealthTracker import HealthTracker
-from yolov5.utils import *
-from torchvision.io import read_image
 import numpy as np
-from PIL import Image
 from mss import mss
 import win32gui
 import config
-import wx
-# Screen capture
-# Model
+from torch import hub
+import torch
 
 
 
@@ -34,63 +25,60 @@ class GetImage(threading.Thread):
         while not self.stopped:
             self.frame = np.array(self.sct.grab(self.bounding_box))
             
-            # if not config.player2.empty():
-            #     self.frame = cv2.circle( self.frame, config.player2.midpoint, radius=0, color=(0,255,255), thickness=2)
     def stop(self):
         self.stopped = True
 
-class SideSelectInput(threading.Thread):
-    def __init__(self, bounding_box):
-        self.bounding_box = bounding_box
-        self.sct = mss()
+class ShowImage(threading.Thread):
+
+    def __init__(self, imageGetter: GetImage):
+        self.imageGetter = imageGetter
         self.stopped = False
-        self.frame =  np.array(self.sct.grab(self.bounding_box))
+
     def start(self):
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.show, args=()).start()
         return self
-    def get(self):
+
+    def show(self):
         while not self.stopped:
-            key = cv2.waitKey(0)
-            if(key == ord(2)):
-                #if left arrow key is press 
-                 
-                pass
-            elif(key == ord(3)):
-                #if right arrow key is press
-                pass   
-                
-            # if not config.player2.empty():
-            #     self.frame = cv2.circle( self.frame, config.player2.midpoint, radius=0, color=(0,255,255), thickness=2)
+            cv2.imshow("Video", self.imageGetter.frame)
+
     def stop(self):
         self.stopped = True
+ 
 
 
 
+class ObjectDetection():
+
+# try loading model first then passing it into class, maybe as an array with index 1 or variable
+    def __init__(self, model = None, model_bool : bool = True):
+        self.game_window = 0
+        win32gui.EnumWindows(self.findStreetFighterWindow, None)
+        print(self.game_window)
+        self.bounding_box = self.getWindowPos(self.game_window)
+        self.model_bool = model_bool
+        if(model_bool):
+            self.model = model
+            self.model.eval()
+            self.model.max_det = 2
 
 
-
-class ObjectDetection:
-    model = torch.hub.load('G:/Object_Detect_Project/yolov5', 'custom',
-                        path="G:/Object_Detect_Project/yolov5/runs/train/exp48/weights/best.pt", source="local", force_reload=True)
-    sct = mss()
-
-    bounding_box = {'top': 0, 'left': 0, 'width': 1248, 'height': 896}
 
     def findStreetFighterWindow( self, hwnd, ctype ):
         """
         Returns window handle, as int, that contains the game title 
         Must be run as a handler for win32gui.EnumWindows()
-
+        
+        hwnd: Window ID as int
         Done this way because win32gui.EnumWindows does not support returning values while looping throught the list of windows
         """
         window_title = win32gui.GetWindowText(hwnd)
         game_name = "Street Fighter III 3rd Strike: Fight for the Future" 
         if game_name in window_title:
             self.game_window = hwnd
-            print(win32gui.GetWindowText(hwnd))
+            print(win32gui.GetWindowText(hwnd) + " " + "LINE 75")
 
    
-
     def getWindowPos(self, hwnd):
         #ToDo: Remove the window menu in the window
         window_box = win32gui.GetWindowRect(hwnd)
@@ -101,27 +89,24 @@ class ObjectDetection:
         h = window_box[3] - y
         return({'top': y, 'left': x , 'width': w , 'height': h })
         
-    def __init__(self):
-        self.game_window = 0
-        win32gui.EnumWindows(self.findStreetFighterWindow, None)
-        print(self.game_window)
-        self.bounding_box = self.getWindowPos(self.game_window)
-   
+
+
+    def detect(self, img):
+        """ Returns image with detection algorithm results"""
+        return self.model(img)
 
     def capture(self):
         """
             Captures the Street Fighter window without displaying predictions
         """
-        imageGetter = GetImage(self.bounding_box)
-        imageGetter.start()
+        imageGetter = GetImage(self.bounding_box).start()
+        imageShower = ShowImage(imageGetter).start()
         while True:
-            cv2.imshow('screen', imageGetter.frame)
-
-            if (cv2.waitKey(1) == ord('q')  or imageGetter.stopped):
-                cv2.destroyAllWindows()
+            if cv2.waitKey(1) == ord("q"):
+                imageShower.stop()
                 imageGetter.stop()
-                break
-            
+
+ 
     def capturePredict(self):
         """
             Captures the Street Fighter window and displays predictions
@@ -132,75 +117,30 @@ class ObjectDetection:
         imageGetter.start()
         sct_img = imageGetter.frame
         results = self.model(sct_img)
+        self.model.cuda()
+
         char1, char2 =  Character.generatePlayers(results.pandas().xyxy[0])
         Character.updatePlayers(char1,char2)
-        # ht = HealthTracker()
 
         while True:
             sct_img = imageGetter.frame
-            results = self.model(sct_img)
-            HealthTracker.updatePlayersHealth(sct_img)
-
-            if not config.player1.empty():
-                # print({config.player1.ymax,config.player1.isKnockedDown()})
-
-                Character.updatePlayers(config.player1,config.player2)
-
+            results = self.model(sct_img, size=640)
             cv2.imshow('screen', np.squeeze(results.render()))
-
-            asyncio.run(HealthTracker.checkHit(3, config.player2))
 
             if (cv2.waitKey(1) == ord('q')  or imageGetter.stopped):
                 cv2.destroyAllWindows()
                 imageGetter.stop()
                 break
+            
+
+if __name__=="__main__":
+
+    model = torch.hub.load('../Object_Detect_Project/yolov5', 'custom',
+                            path="../Object_Detect_Project/yolov5/runs/train/exp48/weights/best.pt", source="local", force_reload=True)
+    od = ObjectDetection(model)
+
+    od.capturePredict()
 
 
 
 
-
-
-    
-
-# device = 'cuda' if torch.cuda.is_available() else 'cpu'
-# model.to(device)
-
-# bounding_box = {'top': 0, 'left': 0, 'width': 1248, 'height': 896}
-
-# sct = mss()
-# while True:
-#     sct_img = np.array(sct.grab(bounding_box))
-
-#     result = model(sct_img)
-#     result.print()
-#     # if result == None:
-#     #     result = sct_img
-
-#     cv2.imshow('screen', np.squeeze(result.render()))
-#     if (cv2.waitKey(1) & 0xFF) == ord('q'):
-#         cv2.destroyAllWindows()
-#         break
-
-
-# Recording Screen
-# while True:
-#     sct_img = sct.grab(bounding_box)
-#     cv2.imshow('screen', np.array(sct_img))
-
-#     if (cv2.waitKey(1) & 0xFF) == ord('q'):
-#         cv2.destroyAllWindows()
-#         break
-
-# results.xyxy[0]  # im1 predictions (tensor)
-# results.pandas().xyxy[0]  # im1 predictions (pandas)
-# # #      xmin    ymin    xmax   ymax  confidence  class    name
-# # # 0  749.50   43.50  1148.0  704.5    0.874023      0  person
-# # # 1  433.50  433.50   517.5  714.5    0.687988     27     tie
-# # # 2  114.75  195.75  1095.0  708.0    0.624512      0  person
-# # # 3  986.00  304.00  1028.0  420.0    0.286865     27     tie
-
-
-#          xmin        ymin         xmax        ymax  confidence  class     name
-# 0  621.556458  465.093292   874.244751  872.699524    0.967523      9  Chun-Li
-# 1  998.945435  423.396118  1203.942261  877.145691    0.930768      9  Chun-Li
-# <class 'pandas.core.frame.DatadaaFrame'>

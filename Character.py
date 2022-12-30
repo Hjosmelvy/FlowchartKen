@@ -1,39 +1,37 @@
-from asyncio import Condition 
-import logging
 from math import sqrt
-import threading
-import time
-import traceback
-from typing import Type
-from xmlrpc.client import Boolean
-import KeyboardOutput.CommandList as CommandList
 import pandas
-from numpy import subtract
-from numpy import absolute
+import ctypes
+from multiprocessing import Event,  Value
+
 
 class Character():
-    previous_health = 0
-    current_health = 0
+    prev_health = Value(ctypes.c_double, 1)
+    current_health = Value(ctypes.c_double, 1)
     health_location = None 
-   
+    hit_event = Event()
     @staticmethod
     def distance(p1, p2):  
         return sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
 
-    def __init__(self, dataframe=pandas.DataFrame()):
-        if not dataframe.empty:
-            self.xmin, self.ymin, self.xmax, self.ymax, confidence, _class, self.name = dataframe
-            self.midpoint = self.calculate_midpoint()
-            self.dataframe = dataframe
-        else:
+    def __init__(self, dataframe = pandas.DataFrame()):
+        if  dataframe.empty:
+
             self.xmin = 0
             self.ymin = 0
             self.xmax = 0
             self.ymax = 0
             self.name = ""
-            self.isRightSide = 0  # which side the character is facing
             self.midpoint = (0, 0)
             self.dataframe = dataframe
+
+         
+        else:
+            self.xmin, self.ymin, self.xmax, self.ymax, confidence, _class, self.name = dataframe
+            self.midpoint = self.calculate_midpoint()
+            self.dataframe = dataframe
+
+        self.side = Value("i", 1)  # which side the character is facing
+
             
 
     def calculate_midpoint(self):
@@ -41,8 +39,6 @@ class Character():
         y = (self.ymin + self.ymax) / 2
         return (x, y)
 
-
-    
     def isKnockedDown(self):
         if self.ymax < 740:
             return True
@@ -56,13 +52,12 @@ class Character():
     def isRightSide(self, otherPlayer):
         # compares other charater's position to determine if the character calling this method is on the right side
         if (not self.empty() and not otherPlayer.empty()):
-
-            if self.xmin > otherPlayer.xmin:
+            if self.midpoint > otherPlayer.midpoint:
+                print("RIGHT SIDE")
                 return True
-        return False
-
- 
-
+            print("LEFT SIDE")
+            return False
+        return None
     def empty(self):
         return self.dataframe.empty
 
@@ -77,13 +72,17 @@ class Character():
             p1 = Character(dataframe.iloc[0])
 
         return p1, p2
+    @staticmethod
+    def getLocationData(dataframe : pandas.core.frame.DataFrame):
+        char1, char2 = Character.generatePlayers(dataframe.pandas().xyxy[0])
 
+        return char1, char2 
     @staticmethod
     def updatePlayers(char1, char2):
         import config as config
-        if config.player1.empty() or config.player2.empty():
-            config.player1 = char1
-            config.player2 = char2
+        if(char1.empty() or char2.empty()):
+            pass
+
         elif Character.distance(config.player1.midpoint, char1.midpoint) < Character.distance(config.player1.midpoint, char2.midpoint):
             # returns true if the current player1 midpoint is closer to the previous known location of player1
             # this is needed because the object detection results arent consistant on which player is detected first thus this ensures player location integrity.
@@ -93,23 +92,9 @@ class Character():
             config.player1 = char2
             config.player2 = char1
 
-class Algorithm(threading.Thread):
-    def __init__(self, character: Character):
-        self.stopped = False
-    def start(self):
-        threading.Thread(target=self.play, args=()).start()
-        return self
-    def stop(self):
-        self.stopped = True
-    def play(self):
-        while not self.stopped:
-            try:
-                CommandList.upLeft()
-                time.sleep(.49)
-                CommandList.fbBackward
-                time.sleep(.5)
-            except Exception as e:
-                logging.error(traceback.format_exc())
-    
+
+
+
+
         
 
