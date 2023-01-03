@@ -106,7 +106,7 @@ class Grabber(mp.Process):
             
 def main():
     model = torch.hub.load('G:/Object_Detect_Project/yolov5', 'custom',
-                            path="G:/Object_Detect_Project/yolov5/runsCopy/train/exp48/weights/best.pt", source="local", force_reload=True)
+                            path="G:/Object_Detect_Project/yolov5/runs/train/exp48/weights/best.pt", source="local", force_reload=True)
     od = ObjectDetection(model)
     q1 = mp.SimpleQueue()
     q2 = mp.SimpleQueue()

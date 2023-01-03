@@ -133,7 +133,7 @@ class ObjectDetection():
                 break
             
 
-if __name__=="__main__":
+if __name__ == "__main__":
 
     model = torch.hub.load('../Object_Detect_Project/yolov5', 'custom',
                             path="../Object_Detect_Project/yolov5/runs/train/exp48/weights/best.pt", source="local", force_reload=True)
