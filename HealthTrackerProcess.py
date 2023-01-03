@@ -1,5 +1,4 @@
 
-import ctypes
 from multiprocessing import Process, Value, Queue, Event, connection
 
 from threading import Thread
@@ -26,10 +25,6 @@ class HitCheck(Thread):
 class HealthTracker(Process):
     def __init__(self, running, queue : Queue  = None ):
         Process.__init__(self)
-        # self.player1_current_health = Value(ctypes.c_double, 1)
-        # self.player2_current_health = Value(ctypes.c_double, 1)
-        # self.player1_prev_health = Value(ctypes.c_double, 1)
-        # self.player2_prev_health = Value(ctypes.c_double, 1)
         self.queue = queue
         self.player1_event = Event()
         self.player2_event = Event() 

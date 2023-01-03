@@ -1,4 +1,3 @@
-
 from threading import Thread
 import threading
 import cv2
@@ -6,8 +5,6 @@ from Character import Character
 import numpy as np
 from mss import mss
 import win32gui
-import config
-from torch import hub
 import torch
 
 
